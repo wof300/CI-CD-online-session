@@ -7,16 +7,20 @@ pipeline {
           checkout scm
           def customImage = docker.build("${registry}:${env.BUILD_ID}")
         }
-
       }
     }
-
+    stage('unit-test') {
+      steps{
+        script {docker.image("${registry}:${env.BUILD_ID}").inside {c ->
+          sh 'python app_test.py'}
+         }
+      }
+    }
+          
     stage('Publish') {
       steps {
         script {
-          docker.withRegistry('', 'dockerhub-id')
-
-          {
+          docker.withRegistry('', 'dockerhub-id') {
             docker.image("${registry}:${env.BUILD_ID}").push('latest')
           }
         }
