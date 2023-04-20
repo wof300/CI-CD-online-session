@@ -84,7 +84,16 @@ pipeline {
 
       }
     }
-
+stage('Deploy') {
+  steps{
+    sh 'docker stop flask-app || true; docker rm flask-app || true; docker run -d --name flask-app -p 9000:9000 vpanton/flask-app:latest'
+  }
+}
+stage('Validation') {
+  steps{
+    sh 'sleep 5; curl -i http://localhost:9000/test_string'
+  }
+}
   }
   environment {
     registry = 'wof300/cicdrepo'
